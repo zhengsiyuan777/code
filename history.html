@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>趣味测试：你的灵魂是哪位历史人物</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        paper: '#f6f1e7',
+        ink: '#2c2416',
+        accent: '#8b5a2b',
+        gold: '#c9a24a',
+        seal: '#a0522d'
+      },
+      fontFamily: {
+        serif: ['"Noto Serif SC"', 'serif']
+      }
+    }
+  }
+}
+</script>
+<style>
+  body {
+    background:
+      radial-gradient(circle at 20% 10%, rgba(201,162,74,0.15), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(139,90,43,0.18), transparent 45%),
+      linear-gradient(180deg, #fbf6ea 0%, #f1e7d2 100%);
+    background-attachment: fixed;
+  }
+  .card {
+    background: rgba(255, 252, 245, 0.86);
+    border: 1px solid rgba(139, 90, 43, 0.25);
+    box-shadow: 0 20px 50px rgba(80, 50, 20, 0.18);
+    backdrop-filter: blur(6px);
+  }
+  .option {
+    transition: all .25s ease;
+    border: 1px solid rgba(139, 90, 43, 0.25);
+  }
+  .option:hover {
+    border-color: #c9a24a;
+    background: rgba(201, 162, 74, 0.08);
+    transform: translateY(-1px);
+  }
+  .option input:checked + div {
+    background: linear-gradient(135deg, #8b5a2b, #a0522d);
+    color: #fff;
+    border-color: #8b5a2b;
+    box-shadow: 0 10px 24px rgba(139, 90, 43, 0.35);
+  }
+  .progress-bar {
+    background: linear-gradient(90deg, #c9a24a, #8b5a2b);
+    transition: width .4s ease;
+  }
+  .result-img {
+    border: 3px solid #c9a24a;
+    box-shadow: 0 20px 40px rgba(139, 90, 43, 0.35);
+  }
+  .tag {
+    background: rgba(201, 162, 74, 0.14);
+    border: 1px solid rgba(201, 162, 74, 0.45);
+    color: #7a5418;
+  }
+  .tag-fun {
+    background: rgba(160, 82, 45, 0.14);
+    border: 1px solid rgba(160, 82, 45, 0.45);
+    color: #633719;
+  }
+  .seal {
+    font-family: 'Noto Serif SC', serif;
+    background: #a0522d;
+    color: #fbf6ea;
+    letter-spacing: 4px;
+  }
+  .fade-in {
+    animation: fadeIn .5s ease both;
+  }
+  .fade-delay-1 { animation-delay: 0.12s; }
+  .fade-delay-2 { animation-delay: 0.24s; }
+  .fade-delay-3 { animation-delay: 0.36s; }
+  .fade-delay-4 { animation-delay: 0.48s; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #8b5a2b, #a0522d);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(139, 90, 43, 0.35);
+    transition: transform .2s ease;
+  }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-primary:disabled {
+    background: #b9a98f;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .page { display: none; }
+  .page.active { display: block; }
+  .fun-card {
+    background: rgba(255, 252, 245, 0.7);
+    border: 1px dashed rgba(160, 82, 45, 0.35);
+  }
+</style>
+</head>
+<body class="font-serif text-ink min-h-screen py-10 px-4">
+<div class="max-w-3xl mx-auto">
+  <!-- 答题页 -->
+  <div id="page-question" class="page active">
+    <header class="text-center mb-10 fade-in">
+      <div class="inline-block seal px-5 py-2 rounded-full text-sm mb-4">古风趣味测试</div>
+      <h1 class="text-4xl md:text-5xl font-black tracking-wider mb-3">你的灵魂是哪位历史人物</h1>
+      <p class="text-ink/70 text-base md:text-lg">凭第一感觉选择 A / B，测完自动揭晓你的灵魂原型。</p>
+    </header>
+    <div class="card rounded-2xl p-4 mb-8 fade-in">
+      <div class="flex justify-between items-center mb-2 text-sm">
+        <span class="font-semibold">答题进度</span>
+        <span id="progressText">0 / 10</span>
+      </div>
+      <div class="w-full h-2.5 bg-white/70 rounded-full overflow-hidden border border-accent/20">
+        <div id="progressBar" class="progress-bar h-full rounded-full" style="width:0%"></div>
+      </div>
+    </div>
+    <main id="questionsWrap" class="space-y-5">
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+          <h2 class="text-xl font-bold pt-1">朋友约你临时出门，你会？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q1" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：兴致很高，收拾一下就出发</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q1" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：更喜欢按原定计划待着，大概率婉拒</div>
+          </label>
+        </div>
+      </section>
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+          <h2 class="text-xl font-bold pt-1">思考一件事，你更容易？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q2" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：联想各种可能性，脑洞发散</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q2" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：聚焦事实细节，看重现实条件</div>
+          </label>
+        </div>
+      </section>
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+          <h2 class="text-xl font-bold pt-1">和人产生分歧，你优先？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q3" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：照顾对方情绪，温和沟通</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q3" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：就事论事，讲清道理对错</div>
+          </label>
+        </div>
+      </section>
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">4</span>
+          <h2 class="text-xl font-bold pt-1">安排任务，你习惯？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q4" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：随性，截止前冲刺完成</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q4" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：提前规划，尽量早点做完</div>
+          </label>
+        </div>
+      </section>
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">5</span>
+          <h2 class="text-xl font-bold pt-1">评价一个故事，你更在意？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q5" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：人物情感、氛围感</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q5" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：逻辑、情节合理性</div>
+          </label>
+        </div>
+      </section>
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">6</span>
+          <h2 class="text-xl font-bold pt-1">空闲时间，你更愿意？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q6" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：发掘很多新鲜兴趣，广泛尝试</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q6" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：深耕少数喜欢的领域</div>
+          </label>
+        </div>
+      </section>
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">7</span>
+          <h2 class="text-xl font-bold pt-1">别人对你的夸奖，你会？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q7" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：开心，乐于被认可</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q7" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：内心淡然，不太在意评价</div>
+          </label>
+        </div>
+      </section>
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">8</span>
+          <h2 class="text-xl font-bold pt-1">做选择时，更多依靠？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q8" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：内心感受、价值偏好</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q8" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：权衡利弊、风险得失</div>
+          </label>
+        </div>
+      </section>
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">9</span>
+          <h2 class="text-xl font-bold pt-1">看待新点子，你倾向？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q9" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：先畅想可能性，觉得很有意思</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q9" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：先评估能不能落地、好不好实现</div>
+          </label>
+        </div>
+      </section>
+      <section class="card rounded-2xl p-6 fade-in">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="seal w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold">10</span>
+          <h2 class="text-xl font-bold pt-1">周末规划，你更喜欢？</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q10" value="A" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">A：没有固定日程，随心而动</div>
+          </label>
+          <label class="option rounded-xl cursor-pointer">
+            <input type="radio" name="q10" value="B" class="hidden" onchange="updateProgress()" />
+            <div class="p-4 rounded-xl font-medium">B：大致安排好行程，心里踏实</div>
+          </label>
+        </div>
+      </section>
+    </main>
+    <div class="text-center mt-8">
+      <button id="submitBtn" class="btn-primary px-10 py-3 rounded-full text-lg font-semibold" disabled onclick="showResult()">查看测试结果</button>
+    </div>
+  </div>
+  <!-- 结果页 -->
+  <div id="page-result" class="page">
+    <div class="card rounded-2xl p-8 md:p-10">
+      <div class="text-center fade-in">
+        <img id="resultImg" class="result-img w-56 h-56 md:w-64 md:h-64 object-cover rounded-2xl mx-auto mb-5" src="" alt="人物画像" />
+        <div class="flex flex-wrap justify-center gap-2 mb-3">
+          <span id="resultMbtTag" class="tag-fun px-3 py-1 rounded-full text-sm font-semibold"></span>
+          <span id="resultKeyTag" class="tag px-3 py-1 rounded-full text-sm font-semibold"></span>
+        </div>
+        <h2 id="resultName" class="text-4xl md:text-5xl font-black mb-3"></h2>
+        <p id="resultTitle" class="text-lg md:text-xl text-ink/75 mb-5"></p>
+        <div class="mb-3 text-lg">匹配相似度：<span id="resultPercent" class="text-seal font-bold text-2xl"></span></div>
+        <div class="w-full h-3 bg-white/70 rounded-full overflow-hidden border border-accent/20 mb-2">
+          <div id="resultBar" class="progress-bar h-full rounded-full"></div>
+        </div>
+        <p id="resultSimilarityText" class="text-sm text-ink/70"></p>
+      </div>
+      <div class="mt-8 space-y-5 text-left">
+        <div class="fade-in fade-delay-1">
+          <h3 class="text-xl font-bold mb-2">🔮 你的灵魂画像</h3>
+          <p id="resultImageDesc" class="leading-relaxed text-ink/85"></p>
+        </div>
+        <div class="fade-in fade-delay-2">
+          <h3 class="text-xl font-bold mb-2">📖 详细性格分析</h3>
+          <p id="resultDetail" class="leading-relaxed text-ink/85"></p>
+        </div>
+        <div class="fun-card rounded-2xl p-5 fade-in fade-delay-3">
+          <h3 class="text-xl font-bold mb-3">🎭 趣味人格标签</h3>
+          <div id="resultFunTags" class="flex flex-wrap gap-2"></div>
+          <p id="resultFunText" class="mt-4 leading-relaxed text-ink/85"></p>
+        </div>
+        <div class="fade-in fade-delay-4">
+          <h3 class="text-xl font-bold mb-2">💡 如果他在现代，会做什么？</h3>
+          <p id="resultModern" class="leading-relaxed text-ink/85"></p>
+        </div>
+        <div class="fade-in fade-delay-4">
+          <h3 class="text-xl font-bold mb-2">✨ 与你的相似度解读</h3>
+          <p id="resultMatchText" class="leading-relaxed text-ink/85"></p>
+        </div>
+      </div>
+      <button class="btn-primary w-full py-4 rounded-xl text-lg font-bold mt-8" onclick="restartTest()">重新测试</button>
+    </div>
+  </div>
+</div>
+<script>
+const characterList = [
+  {
+    code: "ABAAABABBA",
+    name: "苏轼",
+    title: "人间乐天派，永远心怀热忱",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/苏轼1.jpg",
+    mbti: "ENFP",
+    imageDesc: "你像一位从风雨中走来的文人，身上有酒意、诗意，也有烟火气。哪怕境遇起伏，也总能把日子过成一首豁达的诗。",
+    detail: "你热烈浪漫，生命力极强，对世界充满好奇心。共情力强，很容易感知他人情绪，脑洞大，也热爱新鲜事物。你不太会长时间困在负面情绪里，而是会主动在生活中找到乐趣。",
+    funTags: ["美食家", "气氛组", "跨界玩家", "情绪自救大师"],
+    funText: "如果生活是一场饭局，你大概率是那个负责活跃气氛、讲段子，还能即兴写诗的人。别人以为你在emo，结果你转头就去研究新吃法、新玩法了。",
+    modern: "在现代，他会是热爱生活的跨界博主，白天探店，晚上写诗，还会在评论区和网友聊人生。",
+    matchText: "你和苏轼的相似之处，在于都有一种把苦日子过甜的能力。你们未必都想做大人物，但都希望活得真诚、尽兴。"
+  },
+  {
+    code: "ABBBAABBAB",
+    name: "辛弃疾",
+    title: "心中有山河，温柔且有力量",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/辛弃疾1.jpg",
+    mbti: "INFJ",
+    imageDesc: "你的灵魂里藏着一片山河。外表可能温和，内心却有一支从未放下的剑，随时准备为信念挺身而出。",
+    detail: "你是热血理想主义者，内心藏着坚定信念。既有共情他人的柔软，也有清晰的底线与判断力。你向往更广阔的天地，心里一直有自己坚守的目标，而且不是空想派。",
+    funTags: ["理想主义者", "温柔战士", "责任感爆棚", "孤独前行者"],
+    funText: "你平时看起来像个温和文人，一旦有人触碰你的原则，会瞬间切换成‘别惹我’模式。心里有一份自己的山河图，谁也别想乱改。",
+    modern: "在现代，他会是认真做事的团队leader，平时温和，关键时刻非常有决断力。",
+    matchText: "你和辛弃疾的相似之处，在于外表温和、内心有原则。你们都不是只会喊口号的人，而是愿意为信念付出行动。"
+  },
+  {
+    code: "AAAAAAABAA",
+    name: "李白",
+    title: "人间谪仙，一生爱自由",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/李白1.jpg",
+    mbti: "ENFP",
+    imageDesc: "你是风，是酒，是忽然撞入人间的月光。不喜欢被框住，也不爱按剧本走，你的灵魂天生带一点谪仙气。",
+    detail: "你自由浪漫，讨厌束缚。热爱自由，想象力磅礴，习惯遵从内心感受生活。情绪外放，喜欢鲜活、明亮、有诗意的事物，对条条框框天然抗拒。",
+    funTags: ["浪漫主义", "少年意气", "酒仙附体", "规则粉碎机"],
+    funText: "如果人生是一场旅行，你会买一张单程票，不做攻略，走到哪算哪。别人担心迷路，你担心路上没有酒和月亮。",
+    modern: "在现代，他会是说走就走的旅行博主，也可能是写诗、唱歌、做创意内容的自由创作者。",
+    matchText: "你和李白的相似之处，在于都不想被世俗标准完全定义。你们更在意内心是否自由，而不是别人怎么看。"
+  },
+  {
+    code: "BBBBBBBBBB",
+    name: "诸葛亮",
+    title: "谋定而后动，稳重担万事",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/诸葛亮1.jpg",
+    mbti: "INTJ",
+    imageDesc: "你像一枚安静却极有分量的棋子，坐在关键位置。不轻易动，但每一步都经过深思熟虑。",
+    detail: "你沉稳缜密，思虑周全。习惯提前布局，重视事实与逻辑，做事谨慎克制，情绪稳定。遇事不会先慌，而是先想清楚全局、风险和下一步。",
+    funTags: ["战略大师", "细节控", "靠谱担当", "熬夜复盘王"],
+    funText: "别人还在想‘怎么办’，你已经在纸上列好了三套方案。虽然你未必说出来，但你心里早就把后果算明白了。",
+    modern: "在现代，他会是优秀的策略顾问、产品负责人或团队管理者，擅长把复杂问题拆成可执行步骤。",
+    matchText: "你和诸葛亮的相似之处，在于都习惯用理性控制局面。你们不是不慌，而是更愿意在慌乱中找到秩序。"
+  },
+  {
+    code: "ABABABABAB",
+    name: "李清照",
+    title: "心有锦绣，柔而不弱",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/李清照1.jpg",
+    mbti: "INFP",
+    imageDesc: "你不是柔弱的花，而是藏在词句里的光。细腻、敏感、有风骨，能从一片叶、一阵风里读出人生。",
+    detail: "你敏感细腻，风骨藏于柔情之中。感知力极强，对情绪、氛围、美感非常敏锐，内心世界丰富。外表可能柔软，但内心有独立主见，不会随波逐流。",
+    funTags: ["敏感诗人", "氛围捕捉器", "审美在线", "情感收藏家"],
+    funText: "你最擅长的不是吵架，而是‘一句话戳中气氛’。别人还在寒暄，你已经感受到谁不开心了。",
+    modern: "在现代，她会是写文章、做音乐、拍氛围感内容的创作者，能把细腻情绪变成作品。",
+    matchText: "你和李清照的相似之处，在于都有一颗敏感而坚韧的心。你们容易被情绪影响，但也因此比别人更懂美。"
+  },
+  {
+    code: "BABABABABA",
+    name: "陶渊明",
+    title: "守本心，安自然",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/陶渊明1.jpg",
+    mbti: "INFP",
+    imageDesc: "你的灵魂像一条安静的小路，通向田园和本心。不喜欢喧闹的争斗，更在意内心是否真正安稳。",
+    detail: "你淡泊通透，遵从本心取舍。不太追逐外界功名，偏爱简单宁静的生活。内心自洽，懂得取舍，不喜欢复杂人际纷争。",
+    funTags: ["田园派", "反内卷达人", "精神富户", "安静实力派"],
+    funText: "别人卷升职、卷人脉，你卷‘今天的茶很好喝’‘窗外的云很美’。不是你没野心，而是你更想把日子过舒服。",
+    modern: "在现代，他会是喜欢植物、喝茶、写作的生活方式博主，也可能是远离喧嚣的自由职业者。",
+    matchText: "你和陶渊明的相似之处，在于都更看重内心秩序。你们不是没有能力，而是不想为了外界评价牺牲自己的节奏。"
+  },
+  {
+    code: "BBAABBAABB",
+    name: "武则天",
+    title: "心有格局，遇事敢决断",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/武则天1.jpg",
+    mbti: "ENTJ",
+    imageDesc: "你不是按剧本长大的人。冷静、有野心、能权衡局面，也愿意为了目标承担代价。",
+    detail: "你目标导向，意志强大。擅长权衡利弊，冷静理性，目标感强。能看清现实规则，抗压能力强，不会让情绪左右关键选择。",
+    funTags: ["大女主", "目标收割机", "规则改写者", "冷静决断派"],
+    funText: "你不是宫斗爱好者，你是‘规则制定者’。别人在站队，你在想：怎样才能让局面更有利。",
+    modern: "在现代，她会是公司管理者、创业者或战略型领导者，目标感强，也敢于打破常规。",
+    matchText: "你和武则天的相似之处，在于都不害怕做艰难决定。你们更愿意承担代价，而不是困在情绪里。"
+  },
+  {
+    code: "AAABBBAAAB",
+    name: "杜甫",
+    title: "心怀悲悯，厚重温良",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/杜甫1.jpg",
+    mbti: "ISFJ",
+    imageDesc: "你的灵魂里有一颗温热的心，能看见别人看不见的苦。不是不乐观，而是太重情，太在意人间。",
+    detail: "你悲悯温柔，心怀苍生。共情力深，容易看见他人苦难，责任感根植于心。心思细腻，重情重义，对世界有深沉善意。",
+    funTags: ["暖心担当", "共情王者", "现实主义诗人", "操心命"],
+    funText: "你像那个会默默把事情都扛下来的人。别人以为你很坚强，其实你只是见不得别人难。",
+    modern: "在现代，他会是关注现实议题的写作者、教师或公益工作者，愿意为弱者发声。",
+    matchText: "你和杜甫的相似之处，在于都有一颗共情心。你们未必喊得最大声，但会默默把别人的难处放在心上。"
+  },
+  {
+    code: "BBAAABBBAA",
+    name: "曹操",
+    title: "乱世雄才，清醒入世",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/曹操1.jpg",
+    mbti: "ENTP",
+    imageDesc: "你是清醒的现实派，不活在幻想里。能识人，也能断事，只要目标明确，就愿意打破常规去拿结果。",
+    detail: "你现实清醒，不拘世俗。洞察力强，看重实际结果，不被成见束缚。敢打破常规，权衡利弊后会果断行动，也能容纳不同声音。",
+    funTags: ["枭雄型人格", "破局者", "识人高手", "不按套路出牌"],
+    funText: "别人还在讲道德小作文，你已经开始布局下一步。你不是坏，你只是更懂现实怎么运转。",
+    modern: "在现代，他会是创业者、投资人和策略型管理者，擅长抓住机会，也敢于冒险。",
+    matchText: "你和曹操的相似之处，在于都比较清醒现实。你们不喜欢空谈，更在意事情最终能不能做成。"
+  },
+  {
+    code: "AABBAABBAA",
+    name: "王维",
+    title: "诗中有画，静守本心",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/王维1.jpg",
+    mbti: "ISFP",
+    imageDesc: "你像一幅淡墨山水，安静，但很有力量。不喜欢喧闹，能在喧嚣里找到自己的节奏。",
+    detail: "你宁静通透，自带松弛感。喜欢美感与氛围，内心安静，能在热闹世界里守住自己的节奏。不喜激烈冲突，擅长与生活和解。",
+    funTags: ["山水系人格", "安静的美", "佛系但有态度", "氛围制造机"],
+    funText: "别人吵架时你在喝茶，别人内卷时你在看花。不是你没情绪，而是你觉得很多事不值得破坏心境。",
+    modern: "在现代，他会是摄影师、画家、园林设计师或生活方式博主，能把普通日常拍出美感。",
+    matchText: "你和王维的相似之处，在于都喜欢安静而有质感的生活。你们不一定要很热闹，但一定要很舒服。"
+  },
+  {
+    code: "BAABABABBB",
+    name: "商鞅",
+    title: "持正守矩，重行重果",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/商鞅1.jpg",
+    mbti: "ISTJ",
+    imageDesc: "你的灵魂有一把尺子，只量规则和结果。一旦认定制度和原则，就会坚定执行，不喜欢含糊其辞。",
+    detail: "你恪守原则，崇尚秩序。重视逻辑、规则与落地效果，做事黑白分明，目标清晰，愿意为长远目标坚持。",
+    funTags: ["规则建筑师", "结果派", "纪律委员", "说一不二"],
+    funText: "别人还在讲人情世故，你已经把规则列出来了。在你眼里，事情只有‘该做’和‘不该做’，没有太多灰色地带。",
+    modern: "在现代，他会是优秀的制度设计者、审计人员或项目管理者，非常重视流程和结果。",
+    matchText: "你和商鞅的相似之处，在于都很重视规则和执行。你们不是不懂人情，而是更相信公平和制度。"
+  },
+  {
+    code: "ABBAAABABB",
+    name: "杨玉环",
+    title: "人间富贵花，惜取眼前美好",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/杨玉环1.jpg",
+    mbti: "ESFP",
+    imageDesc: "你把生活当成一场盛宴，不是因为奢侈，而是因为你真心喜欢那些闪光、热烈、值得被记住的瞬间。",
+    detail: "你热爱生活，感知美好。情绪直白，待人热忱，很容易感受到微小快乐。你喜欢烟火气和美，也愿意把氛围带给身边人。",
+    funTags: ["氛围美人", "快乐发动机", "活在当下", "美好收藏家"],
+    funText: "你最擅长把普通日子过成节日。一顿好饭、一束花、一首好听的歌，都能让你开心很久。",
+    modern: "在现代，她会是活动策划、主持人、美妆博主或生活方式达人，擅长制造快乐和仪式感。",
+    matchText: "你和杨玉环的相似之处，在于都很懂得享受当下。你们不是不考虑未来，而是更不想辜负眼前的美好。"
+  },
+  {
+    code: "AAABAAAAAA",
+    name: "庄子",
+    title: "物我两忘，逍遥人间",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/庄子1.jpg",
+    mbti: "INTP",
+    imageDesc: "你的灵魂像蝴蝶，不喜欢被抓住。比起输赢，你更想知道风从哪来，梦往哪去。",
+    detail: "你逍遥自在，追求精神自由。想象力强，喜欢思考天地万物，不被世俗绑架，重视内心自在。不爱内卷争斗，认为精神丰盈比物质得失更重要。",
+    funTags: ["哲学系", "脑洞王者", "精神自由派", "蝴蝶梦代表"],
+    funText: "别人在比谁更成功，你在想‘蝴蝶到底梦见了什么’。不是你懒，而是你觉得很多事本来就没那么重要。",
+    modern: "在现代，他会是哲学家、自媒体创作者或自由思考者，喜欢研究宏大问题，也喜欢安静独处。",
+    matchText: "你和庄子的相似之处，在于都不想被世俗标准绑架。你们更在意精神自由，而不是一时得失。"
+  },
+  {
+    code: "BBBABBBBAB",
+    name: "伍子胥",
+    title: "隐忍持志，慧眼识危",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/伍子胥1.jpg",
+    mbti: "INTJ",
+    imageDesc: "你不轻易相信表象，也不喜欢听漂亮话。你更愿意看一个人真正做了什么，看一件事最终会走向哪里。",
+    detail: "你恩怨分明，意志坚韧。洞察力强，看问题直击本质，重承诺，记恩也记仇。目标感强，一旦认定方向，能长期坚持。",
+    funTags: ["洞察派", "复仇者联盟", "硬骨头", "长期主义者"],
+    funText: "你不是记仇，你是‘记性太好’。别人说过什么、做过什么，你心里都有一本账。",
+    modern: "在现代，他会是战略分析师、侦探型人物或硬核管理者，能从细节中发现风险。",
+    matchText: "你和伍子胥的相似之处，在于都有极强的洞察力和坚持力。你们一旦认准目标，就很难被说服。"
+  },
+  {
+    code: "BABBAABABB",
+    name: "班昭",
+    title: "博学知礼，温润自持",
+    img: "https://ghproxy.net/https://raw.githubusercontent.com/zhengsiyuan777/pic/main/班昭1.jpg",
+    mbti: "ISFJ",
+    imageDesc: "你像一本好书，安静、有分量、值得反复读。不张扬，但说话做事都有自己的章法。",
+    detail: "你博学沉稳，温润有力量。兼具理性与温柔，善于梳理繁杂事务，做事审慎周全。懂得平衡人情与道理，有学识风骨，也懂变通。",
+    funTags: ["知性派", "整理大师", "温柔但有主见", "靠谱担当"],
+    funText: "你是那种能把乱成一团的事情慢慢理清楚的人。别人急得跳脚，你还在慢悠悠说：先别急，我们一条一条来。",
+    modern: "在现代，她会是编辑、研究员、教师或内容统筹，擅长把复杂信息整理得清楚有序。",
+    matchText: "你和班昭的相似之处，在于都温和但有章法。你们不一定最张扬，但一定让人觉得可靠。"
+  }
+];
+const totalQuestion = 10;
+function updateProgress(){
+  let checkedCount = 0;
+  for(let i = 1; i <= totalQuestion; i++){
+    if(document.querySelector(`input[name="q${i}"]:checked`)) checkedCount++;
+  }
+  const percent = (checkedCount / totalQuestion) * 100;
+  document.getElementById("progressText").innerText = `${checkedCount} / ${totalQuestion}`;
+  document.getElementById("progressBar").style.width = `${percent}%`;
+  document.getElementById("submitBtn").disabled = checkedCount < totalQuestion;
+}
+function showResult(){
+  const inputs = document.querySelectorAll('input[type="radio"]:checked');
+  if(inputs.length < totalQuestion){
+    alert("请完成全部10道题目！");
+    return;
+  }
+  let ansCode = "";
+  inputs.forEach(i => ansCode += i.value);
+  let bestMatch = characterList[0];
+  let minDiff = 999;
+  characterList.forEach(person => {
+    let diff = 0;
+    for(let i = 0; i < 10; i++){
+      if(person.code[i] !== ansCode[i]) diff++;
+    }
+    if(diff < minDiff){
+      minDiff = diff;
+      bestMatch = person;
+    }
+  });
+  const similarity = ((10 - minDiff) / 10 * 100).toFixed(0);
+  document.getElementById("resultImg").src = bestMatch.img;
+  document.getElementById("resultImg").alt = bestMatch.name;
+  document.getElementById("resultName").innerText = bestMatch.name;
+  document.getElementById("resultTitle").innerText = bestMatch.title;
+  document.getElementById("resultMbtTag").innerText = "MBTI：" + bestMatch.mbti;
+  document.getElementById("resultKeyTag").innerText = bestMatch.title;
+  document.getElementById("resultPercent").innerText = similarity + "%";
+  document.getElementById("resultBar").style.width = similarity + "%";
+  document.getElementById("resultImageDesc").innerText = bestMatch.imageDesc;
+  document.getElementById("resultDetail").innerText = bestMatch.detail;
+  document.getElementById("resultFunText").innerText = bestMatch.funText;
+  document.getElementById("resultModern").innerText = bestMatch.modern;
+  document.getElementById("resultMatchText").innerText = bestMatch.matchText;
+  const funTagsWrap = document.getElementById("resultFunTags");
+  funTagsWrap.innerHTML = "";
+  bestMatch.funTags.forEach(tag => {
+    const span = document.createElement("span");
+    span.className = "tag-fun px-3 py-1 rounded-full text-sm font-semibold";
+    span.innerText = tag;
+    funTagsWrap.appendChild(span);
+  });
+  let matchTip = "";
+  if(similarity >= 90) matchTip = "几乎是灵魂复刻，你们的底层偏好非常接近。";
+  else if(similarity >= 75) matchTip = "相似度很高，你们在很多重要选择上会很像。";
+  else if(similarity >= 60) matchTip = "有不少相似之处，也有各自不同的侧面。";
+  else matchTip = "相似度中等，你们更像同气质但不同活法的人。";
+  document.getElementById("resultSimilarityText").innerText = matchTip;
+  document.getElementById("page-question").classList.remove("active");
+  document.getElementById("page-result").classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function restartTest(){
+  document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+  updateProgress();
+  document.getElementById("page-result").classList.remove("active");
+  document.getElementById("page-question").classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+</script>
+</body>
+</html>
